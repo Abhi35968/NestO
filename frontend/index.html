@@ -101,6 +101,15 @@
             </button>
           </div>
         </div>
+        <div class="form-group">
+          <label>Role</label>
+          <select id="r-role" class="form-control" required>
+            <option value="resident">Resident</option>
+            <option value="admin">Admin</option>
+            <option value="security">Security</option>
+            <option value="staff">Staff</option>
+          </select>
+        </div>
         <button type="submit" class="btn btn-primary w-full">Create Account</button>
       </form>
 
@@ -180,6 +189,7 @@
           email: document.getElementById('r-email').value,
           phone: document.getElementById('r-phone').value || null,
           password: document.getElementById('r-pass').value,
+          role: document.getElementById('r-role').value,
         });
         setAuth(data.access_token, data.user);
         window.location.href = '/dashboard.html';

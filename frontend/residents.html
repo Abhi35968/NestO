@@ -84,6 +84,39 @@
   </div>
 </div>
 
+<!-- Edit Flat Modal -->
+<div class="modal-overlay" id="edit-flat-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Edit Flat</span>
+      <button class="modal-close" onclick="closeModal('edit-flat-modal')"><i data-lucide="x" style="width:15px;height:15px"></i></button>
+    </div>
+    <form onsubmit="updateFlat(event)">
+      <div class="grid-2">
+        <div class="form-group"><label>Flat Number*</label>
+          <input id="ef-num" class="form-control" required></div>
+        <div class="form-group"><label>Block</label>
+          <input id="ef-block" class="form-control"></div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group"><label>Floor</label>
+          <input id="ef-floor" type="number" class="form-control"></div>
+        <div class="form-group"><label>Area (sqft)</label>
+          <input id="ef-area" type="number" class="form-control"></div>
+      </div>
+      <div class="form-group"><label>Resident</label>
+        <select id="ef-resident" class="form-control"><option value="">— Unoccupied —</option></select>
+      </div>
+      <div class="form-group"><label>Ownership Type</label>
+        <select id="ef-owner" class="form-control">
+          <option value="true">Owner</option><option value="false">Tenant</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary w-full">Update Flat</button>
+    </form>
+  </div>
+</div>
+
 <!-- Add User Modal -->
 <div class="modal-overlay" id="add-user-modal">
   <div class="modal">
@@ -143,11 +176,19 @@ async function loadAll() {
 
   // Populate resident dropdown
   const sel = document.getElementById('f-resident');
+  const esel = document.getElementById('ef-resident');
+  sel.innerHTML = '<option value="">— Unoccupied —</option>';
+  if (esel) esel.innerHTML = '<option value="">— Unoccupied —</option>';
   const residents = allUsers.filter(u=>u.role==='resident');
   residents.forEach(r => {
     const o = document.createElement('option');
     o.value = r.id; o.textContent = `${r.name} (${r.email})`;
     sel.appendChild(o);
+    if (esel) {
+      const eo = document.createElement('option');
+      eo.value = r.id; eo.textContent = `${r.name} (${r.email})`;
+      esel.appendChild(eo);
+    }
   });
 
   renderFlatTable(allFlats);
@@ -218,8 +259,40 @@ async function addUser(e) {
   } catch(err) { showError(err.message); }
 }
 
+let currentEditFlatId = null;
+
 function editFlat(id) {
-  showAlert('Edit functionality — coming soon', 'error');
+  const flat = allFlats.find(f => f.id === id);
+  if (!flat) return;
+  currentEditFlatId = id;
+  document.getElementById('ef-num').value = flat.flat_number || '';
+  document.getElementById('ef-block').value = flat.block || '';
+  document.getElementById('ef-floor').value = flat.floor || '';
+  document.getElementById('ef-area').value = flat.area_sqft || '';
+  document.getElementById('ef-resident').value = flat.resident?.id || '';
+  document.getElementById('ef-owner').value = flat.is_owner ? 'true' : 'false';
+  openModal('edit-flat-modal');
+  if(typeof lucide!=="undefined")lucide.createIcons();
+}
+
+async function updateFlat(e) {
+  e.preventDefault();
+  if (!currentEditFlatId) return;
+  try {
+    await api('PUT', `/api/residents/${currentEditFlatId}`, {
+      flat_number: document.getElementById('ef-num').value,
+      block: document.getElementById('ef-block').value || null,
+      floor: parseInt(document.getElementById('ef-floor').value) || null,
+      area_sqft: parseFloat(document.getElementById('ef-area').value) || null,
+      resident_id: parseInt(document.getElementById('ef-resident').value) || null,
+      is_owner: document.getElementById('ef-owner').value === 'true',
+    });
+    showAlert('Flat updated!'); 
+    closeModal('edit-flat-modal'); 
+    loadAll();
+  } catch(err) { 
+    showError(err.message); 
+  }
 }
   if(typeof lucide!=="undefined")lucide.createIcons();
 </script>

@@ -11,7 +11,7 @@
   <aside class="sidebar" id="sidebar"></aside>
   <main class="main-content">
     <div class="topbar">
-      <div><div class="page-title">Good <span id="greeting"></span> 👋</div>
+      <div><div class="page-title">Good <span id="greeting"></span></div>
         <p class="text-muted text-sm mt-1" id="user-greeting"></p></div>
       <div class="topbar-actions">
         <span id="date-display" style="color:var(--text2);font-size:.85rem"></span>
@@ -60,7 +60,7 @@ if (user) {
   // Greeting
   const h = new Date().getHours();
   document.getElementById('greeting').textContent =
-    h < 12 ? 'morning,' : h < 17 ? 'afternoon,' : 'evening,';
+    h < 12 ? 'morning' : h < 17 ? 'afternoon' : 'evening';
   document.getElementById('user-greeting').textContent = `Welcome back, ${user.name}`;
   document.getElementById('date-display').textContent =
     new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
